@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sakuraba Ema · Companion preview</title>
+<style>
+:root{font:16px system-ui,sans-serif;color:#302936;background:#fbf7fa}body{max-width:840px;margin:36px auto;padding:0 20px}h1{font-size:28px;margin-bottom:6px}p{color:#706473;line-height:1.5}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}button{font:inherit;border:1px solid #dbcbd6;border-radius:10px;background:white;color:inherit;padding:9px 13px;cursor:pointer}button[aria-pressed=true]{background:#533d50;color:white;border-color:#533d50}.stage{height:420px;border:1px solid #eadde6;border-radius:18px;display:grid;place-items:center;background:#fff;position:relative;overflow:hidden}.pet{width:192px;height:208px;background:url('spritesheet.webp') 0 0/1536px 2288px no-repeat;pointer-events:none}.caption{position:absolute;bottom:18px;color:#786675;font-size:14px}.note{font-size:13px}button:focus-visible{outline:3px solid #d792ba;outline-offset:3px}
+</style>
+<h1>Sakuraba Ema</h1><p>Choose an animation, or select <strong>Look around</strong> and move the pointer around Ema.</p>
+<div class="controls" id="controls" aria-label="Animation"></div>
+<div class="stage" id="stage"><div class="pet" id="pet" role="img" aria-label="Animated Sakuraba Ema"></div><div class="caption" id="caption">Idle</div></div>
+<p class="note">This preview uses the same sprite sheet as the Codex companion. Keep this file beside spritesheet.webp.</p>
+<script>
+const states=[['Idle',0,[280,110,110,140,140,320]],['Move right',1,[120,120,120,120,120,120,120,220]],['Move left',2,[120,120,120,120,120,120,120,220]],['Wave',3,[140,140,140,280]],['Jump',4,[140,140,140,140,280]],['Disappointed',5,[140,140,140,140,140,140,140,240]],['Waiting',6,[150,150,150,150,150,260]],['Working',7,[120,120,120,120,120,220]],['Review',8,[150,150,150,150,150,280]],['Look around',9,null]];
+const pet=document.querySelector('#pet'),stage=document.querySelector('#stage'),caption=document.querySelector('#caption'),controls=document.querySelector('#controls');let current=0,frame=0,last=performance.now();
+function draw(row,col){pet.style.backgroundPosition=`${-col*192}px ${-row*208}px`}
+states.forEach((s,i)=>{const b=document.createElement('button');b.textContent=s[0];b.setAttribute('aria-pressed',String(i===0));b.onclick=()=>{current=i;frame=0;last=performance.now();caption.textContent=s[0];[...controls.children].forEach((x,k)=>x.setAttribute('aria-pressed',String(k===i)));draw(i===9?0:s[1],i===9?6:0)};controls.append(b)});
+stage.onpointermove=e=>{if(current!==9)return;const box=pet.getBoundingClientRect(),dx=e.clientX-(box.left+box.width/2),dy=e.clientY-(box.top+box.height/2);if(Math.hypot(dx,dy)<38){draw(0,6);caption.textContent='Looking forward';return}const angle=(Math.atan2(dx,-dy)*180/Math.PI+360)%360,index=Math.round(angle/22.5)%16;draw(9+Math.floor(index/8),index%8);caption.textContent='Following your pointer'};
+stage.onpointerleave=()=>{if(current===9){draw(0,6);caption.textContent='Look around'}};
+function tick(now){const s=states[current];if(s[2]&&now-last>=s[2][frame]){last=now;frame=(frame+1)%s[2].length;draw(s[1],frame)}requestAnimationFrame(tick)}requestAnimationFrame(tick);
+</script></html>
