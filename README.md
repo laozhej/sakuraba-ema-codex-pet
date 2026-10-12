@@ -1,4 +1,5 @@
 # Sakuraba Ema · Codex Pet
+Petdex link: https://petdex.dev/pets/sakuraba-ema
 
 [English](#english) · [简体中文](#简体中文) · [日本語](#日本語)
 
